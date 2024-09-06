@@ -15,6 +15,7 @@
     "module": "NodeNext",
     "outDir": "dist",
     "sourceMap": true,
+    "removeComments": true,
 
     /* strictness */
     "strict": true,
