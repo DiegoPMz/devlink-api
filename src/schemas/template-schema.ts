@@ -12,7 +12,7 @@ const profileLinksContentSchema = z.object({
 });
 
 export const updateTemplateSchema = z.object({
-  Profile_email: z
+  profile_email: z
     .string({ message: "Email must be a string" })
     .email({ message: "Invalid email" }),
   profile_name: z
@@ -28,3 +28,5 @@ export const updateTemplateSchema = z.object({
     .array(profileLinksContentSchema)
     .nonempty({ message: "The user links can't be empty" }),
 });
+
+export type UpdateTemplateType = z.infer<typeof updateTemplateSchema>;
