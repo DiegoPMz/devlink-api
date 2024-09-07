@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema(
       require: true,
       _id: false,
     },
-    Profile_email: String,
+    profile_email: String,
     profile_name: String,
     profile_last_name: String,
     profile_image: String,
