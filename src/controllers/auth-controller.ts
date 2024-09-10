@@ -42,12 +42,12 @@ export const register: RegisterController = async (req, res) => {
 
     const accessToken = await createAccessToken({
       email,
-      roles: newUser.credentials?.roles,
+      roles: newUser.credentials?.roles as string,
       createdAt: newUser.createdAt,
     });
     const refreshToken = await createRefreshToken({
       email,
-      roles: newUser.credentials?.roles,
+      roles: newUser.credentials?.roles as string,
       createdAt: newUser.createdAt,
     });
 
@@ -95,12 +95,12 @@ export const login: LoginController = async (req, res) => {
 
     const accessToken = await createAccessToken({
       email,
-      roles: userDb.credentials?.roles,
+      roles: userDb.credentials?.roles as string,
       createdAt: userDb.createdAt,
     });
     const refreshToken = await createRefreshToken({
       email,
-      roles: userDb.credentials?.roles,
+      roles: userDb.credentials?.roles as string,
       createdAt: userDb.createdAt,
     });
     res.cookie("access_token", accessToken, { httpOnly: true, secure: true });

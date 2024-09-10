@@ -1,15 +1,17 @@
 import z from "zod";
 
-export const loginSchema = z.object({
-  email: z
-    .string({ message: "Email must be a string" })
-    .email({ message: "Invalid email" }),
+export const loginSchema = z
+  .object({
+    email: z
+      .string({ message: "Email must be a string" })
+      .email({ message: "Invalid email" }),
 
-  password: z
-    .string({ message: "Password must be a string" })
-    .trim()
-    .min(1, { message: "Password can't be empty" }),
-});
+    password: z
+      .string({ message: "Password must be a string" })
+      .trim()
+      .min(1, { message: "Password can't be empty" }),
+  })
+  .strict({ message: "Incorrect request, please check the data provided" });
 
 export const registerSchema = z
   .object({
@@ -27,6 +29,7 @@ export const registerSchema = z
       .trim()
       .min(1, { message: "Password can't be empty" }),
   })
+  .strict({ message: "Incorrect request, please check the data provided" })
   .refine((data) => data.password === data.confirm_password, {
     message: "Passwords don't match",
     path: ["confirm_password"],
