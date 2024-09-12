@@ -5,6 +5,10 @@ import {
   createRefreshToken,
 } from "@/services/jwtTokens-service";
 import { comparePasswords } from "@/utils/crypt-password-utils";
+import {
+  defaultUserResponseDto,
+  registerResponseDto,
+} from "@/utils/responseUserModel-dtos";
 import bcrypt from "bcryptjs";
 import { RequestHandler } from "express";
 
@@ -54,17 +58,7 @@ export const register: RegisterController = async (req, res) => {
     res.cookie("access_token", accessToken, { httpOnly: true });
     res.cookie("refresh_token", refreshToken, { httpOnly: true });
 
-    return res.json({
-      email: newUser.email,
-      profile_email: newUser.email,
-      profile_name: "",
-      profile_last_name: "",
-      profile_image: "",
-      profile_links: [],
-      profile_template: "",
-      createdAt: newUser.createdAt,
-      updatedAt: newUser.updatedAt,
-    });
+    return res.json(registerResponseDto(newUser));
   } catch (err) {
     console.log(err);
     return res.status(404).json({
@@ -106,17 +100,7 @@ export const login: LoginController = async (req, res) => {
     res.cookie("access_token", accessToken, { httpOnly: true, secure: true });
     res.cookie("refresh_token", refreshToken, { httpOnly: true, secure: true });
 
-    return res.json({
-      email: userDb.email,
-      profile_email: userDb.profile_email,
-      profile_name: userDb.profile_name,
-      profile_last_name: userDb.profile_last_name,
-      profile_image: userDb.profile_image,
-      profile_links: userDb.profile_links,
-      profile_template: userDb.profile_template,
-      createdAt: userDb.createdAt,
-      updatedAt: userDb.updatedAt,
-    });
+    return res.json(defaultUserResponseDto(userDb));
   } catch (err) {
     console.log(err);
     return res.status(404).send("bad request");

@@ -1,5 +1,25 @@
 import mongoose, { InferSchemaType } from "mongoose";
 
+// interface UserCredentialType {
+//   type : string
+// }
+
+// interface UserLinkTypes {
+//   platform: string, url: string
+// }
+
+// interface UserType {
+//   email : string,
+//   password : string,
+//   credentials : UserCredentialType,
+//   profile_email : string,
+// profile_name : string,
+// profile_last_name : string,
+// profile_image : string,
+// profile_links : UserLinkTypes[] | [],
+// profile_template : string,
+// }
+
 const roleSchema = new mongoose.Schema({
   roles: {
     type: String,
@@ -36,4 +56,4 @@ const userSchema = new mongoose.Schema(
 );
 
 export default mongoose.model("User", userSchema);
-export type userSchemaType = InferSchemaType<typeof userSchema>;
+export type UserSchemaType = InferSchemaType<typeof userSchema>;
