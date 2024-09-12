@@ -1,9 +1,13 @@
 import { APP_ISSUER, PRIVATE_KEY } from "@/config/securityDetails";
 import jwt from "jsonwebtoken";
 
-type PayloadType = string | Buffer | object;
+export interface JwtPayloadType {
+  email: string;
+  roles: string;
+  createdAt: NativeDate;
+}
 
-export const createAccessToken = (payload: PayloadType) => {
+export const createAccessToken = (payload: JwtPayloadType) => {
   return new Promise<string>((resolve, reject) => {
     const options: jwt.SignOptions = {
       algorithm: "HS256",
@@ -19,7 +23,7 @@ export const createAccessToken = (payload: PayloadType) => {
   });
 };
 
-export const createRefreshToken = (payload: PayloadType) => {
+export const createRefreshToken = (payload: JwtPayloadType) => {
   return new Promise<string>((resolve, reject) => {
     const options: jwt.SignOptions = {
       algorithm: "HS256",
