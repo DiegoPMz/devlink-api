@@ -55,11 +55,10 @@ export const register: RegisterController = async (req, res) => {
 
     return res.json(registerResponseDto(newUser));
   } catch (err) {
-    console.log(err);
-    return res.status(404).json({
-      status: "404",
-      message: "Server error. Please try again ",
-    });
+    console.error(err);
+    return res
+      .status(404)
+      .json(errorResponse("Server error: Unable to complete the request"));
   }
 };
 
@@ -69,18 +68,14 @@ export const login: LoginController = async (req, res) => {
     const userDb = await UserModel.findOne({ email: email });
 
     if (!userDb)
-      return res
-        .status(400)
-        .json({ status: "400", message: "Invalid credentials" });
+      return res.status(400).json(errorResponse("Invalid credentials", "400"));
 
     const arePasswordEquals = await comparePasswords(
       password,
       userDb.password as string,
     );
     if (!arePasswordEquals)
-      return res
-        .status(400)
-        .json({ status: "400", message: "Incorrect password" });
+      return res.status(400).json(errorResponse("Incorrect password", "400"));
 
     const accessToken = await createAccessToken({
       email,
@@ -98,6 +93,6 @@ export const login: LoginController = async (req, res) => {
     return res.json(defaultUserResponseDto(userDb));
   } catch (err) {
     console.log(err);
-    return res.status(404).send("bad request");
+    return res.status(404).send("Server error: Unable to complete the request");
   }
 };
