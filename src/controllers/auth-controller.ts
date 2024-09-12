@@ -5,6 +5,7 @@ import {
   createRefreshToken,
 } from "@/services/jwtTokens-service";
 import { comparePasswords } from "@/utils/crypt-password-utils";
+import { errorResponse } from "@/utils/errorResponse-dto";
 import {
   defaultUserResponseDto,
   registerResponseDto,
@@ -21,15 +22,9 @@ export const register: RegisterController = async (req, res) => {
 
     const existEmailDb = await UserModel.findOne({ email: email });
     if (existEmailDb)
-      return res.status(400).json({
-        status: "400",
-        message: "Email already in use",
-      });
+      return res.status(400).json(errorResponse("Email already in use", "400"));
     if (password !== confirm_password)
-      return res.status(400).json({
-        status: "400",
-        message: "invalid password",
-      });
+      return res.status(400).json(errorResponse("invalid password", "400"));
 
     const passwordHash = await bcrypt.hash(password, 10);
     const newUser = await UserModel.create({
