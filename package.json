@@ -8,8 +8,8 @@
     "dev": "npx nodemon ",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "form-c": "npx prettier . --check",
-    "form-w": "npx prettier . --write",
+    "f-check": "npx prettier . --check",
+    "f-write": "npx prettier . --write",
     "lint": "npx eslint . --fix-dry-run "
   },
   "keywords": [

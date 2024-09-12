@@ -1,17 +1,14 @@
-import { RequestUserPropExtended } from "@/middlewares/verifyToken-middleware";
 import userModel from "@/models/user-model";
 import { TemplateType } from "@/schemas/template-schema";
 import { errorResponse } from "@/utils/errorResponse-dto";
 import { defaultUserResponseDto } from "@/utils/responseUserModel-dtos";
-import { Response } from "express";
+import { Request, Response } from "express";
 
-interface RequestTemplate extends RequestUserPropExtended {
-  body: TemplateType;
-}
+type RequestTemplate = Request<unknown, unknown, TemplateType, unknown>;
 
 export const updateTemplate = async (req: RequestTemplate, res: Response) => {
   try {
-    const userTokenDetails = req.userToken;
+    const userTokenDetails = req.user;
     const updatedData = req.body;
 
     const userDb = await userModel.findOneAndUpdate(
