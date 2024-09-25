@@ -1,30 +1,15 @@
 import mongoose, { InferSchemaType } from "mongoose";
 
-// interface UserCredentialType {
-//   type : string
-// }
-
-// interface UserLinkTypes {
-//   platform: string, url: string
-// }
-
-// interface UserType {
-//   email : string,
-//   password : string,
-//   credentials : UserCredentialType,
-//   profile_email : string,
-// profile_name : string,
-// profile_last_name : string,
-// profile_image : string,
-// profile_links : UserLinkTypes[] | [],
-// profile_template : string,
-// }
-
 const roleSchema = new mongoose.Schema({
   roles: {
     type: String,
     required: true,
   },
+});
+
+const imageSchema = new mongoose.Schema({
+  id: String,
+  url: String,
 });
 
 const userSchema = new mongoose.Schema(
@@ -46,7 +31,7 @@ const userSchema = new mongoose.Schema(
     profile_email: String,
     profile_name: String,
     profile_last_name: String,
-    profile_image: String,
+    profile_image: imageSchema,
     profile_links: [{ platform: String, url: String }],
     profile_template: String,
   },
