@@ -34,7 +34,10 @@ export const register: RegisterController = async (req, res) => {
       profile_email: email,
       profile_name: "",
       profile_last_name: "",
-      profile_image: "",
+      profile_image: {
+        id: "",
+        url: "",
+      },
       profile_links: [],
       profile_template: "",
     });

@@ -5,6 +5,8 @@ import { errorResponse } from "@/utils/errorResponse-dto";
 import { defaultUserResponseDto } from "@/utils/responseUserModel-dtos";
 import { Request, Response } from "express";
 
+type GetTemplateRequest = Request<{ id: string }>;
+
 export const updateTemplate = async (req: Request, res: Response) => {
   try {
     if (!req.body.data)
@@ -73,8 +75,6 @@ export const updateTemplate = async (req: Request, res: Response) => {
   }
 };
 
-type GetTemplateRequest = Request<{ id: string }>;
-
 export const getTemplate = async (req: GetTemplateRequest, res: Response) => {
   try {
     const id = req.params.id;
@@ -99,7 +99,7 @@ export const getTemplate = async (req: GetTemplateRequest, res: Response) => {
   } catch (err) {
     console.log(err);
     return res
-      .status(404)
+      .status(400)
       .json(errorResponse("User not found with the provided ID", "400"));
   }
 };
