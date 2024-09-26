@@ -15,7 +15,9 @@ const storeFile = multer({
   fileFilter(_, file, callback) {
     if (!FILE_TYPES.includes(file.mimetype))
       return callback(
-        new multer.MulterError("LIMIT_FIELD_VALUE", file.fieldname),
+        new Error(
+          `Invalid file type: ${file.mimetype}. Allowed types are: ${FILE_TYPES.join(", ")}`,
+        ),
       );
     return callback(null, true);
   },
