@@ -43,8 +43,11 @@ export const templateSchema = z
       .string({ message: "Last name must be a string" })
       .min(1, { message: "Last name can't be empty " }),
     profile_image: z
-      .string({ message: "Last name must be a string" })
-      .min(1, { message: "image can't be empty " }),
+      .object({
+        id: z.string().min(1, { message: "Image id can't be empty " }),
+        url: z.string().min(1, { message: "Image url can't be empty " }),
+      })
+      .optional(),
     profile_links: z
       .array(profileLinksSchema, {
         message: "Profile links must be a valid array",
@@ -54,3 +57,7 @@ export const templateSchema = z
   .strict({ message: "Incorrect request, please check the data provided" });
 
 export type TemplateType = z.infer<typeof templateSchema>;
+
+export const getTemplateSchema = z
+  .string({ message: "The value provided must be a valid string" })
+  .min(1, { message: "The Template ID cannot be an empty string" });
