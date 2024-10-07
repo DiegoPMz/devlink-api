@@ -1,40 +1,59 @@
-import { APP_ISSUER, PRIVATE_KEY } from "@/config/securityDetails";
+import { APP_ISSUER, PRIVATE_KEY } from "@/config/jwt-config";
 import jwt from "jsonwebtoken";
 
 export interface JwtPayloadType {
-  email: string;
+  id: string;
   roles: string;
-  createdAt: NativeDate;
 }
 
-export const createAccessToken = (payload: JwtPayloadType) => {
+interface verifyJWTResponse {
+  decoded: undefined | JwtPayloadType;
+  error: false | string;
+}
+
+const createJWT = (payload: JwtPayloadType, expiresIn: string) => {
   return new Promise<string>((resolve, reject) => {
-    const options: jwt.SignOptions = {
+    const OPTIONS: jwt.SignOptions = {
       algorithm: "HS256",
       issuer: APP_ISSUER,
-      subject: "CURRENT_USER",
-      expiresIn: "900000",
+      subject: payload.id,
+      expiresIn: expiresIn,
     };
 
-    jwt.sign(payload, PRIVATE_KEY, options, (err, token) => {
+    jwt.sign(payload, PRIVATE_KEY, OPTIONS, (err, token) => {
       if (err) reject(err.message);
       if (token) resolve(token);
     });
   });
 };
 
-export const createRefreshToken = (payload: JwtPayloadType) => {
-  return new Promise<string>((resolve, reject) => {
-    const options: jwt.SignOptions = {
-      algorithm: "HS256",
-      issuer: APP_ISSUER,
-      subject: "CURRENT_USER",
-      expiresIn: "20d",
-    };
+export const createAccessToken = (payload: JwtPayloadType) => {
+  return createJWT(payload, "30s");
+};
 
-    jwt.sign(payload, PRIVATE_KEY, options, (err, token) => {
-      if (err) reject(err.message);
-      if (token) resolve(token);
+export const createRefreshToken = (payload: JwtPayloadType) => {
+  return createJWT(payload, "1m");
+};
+
+export const verifyJWT = (token: string) => {
+  const OPTIONS: jwt.VerifyOptions = {
+    algorithms: ["HS256"],
+    issuer: APP_ISSUER,
+  };
+
+  return new Promise<verifyJWTResponse>((resolve) => {
+    jwt.verify(token, PRIVATE_KEY, OPTIONS, (err, tokenDecoded) => {
+      if (err) {
+        return resolve({
+          decoded: undefined,
+          error: err.message,
+        });
+      }
+
+      return resolve({
+        decoded: tokenDecoded as JwtPayloadType,
+        error: false,
+      });
     });
   });
 };
