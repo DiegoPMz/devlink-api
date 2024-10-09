@@ -5,7 +5,6 @@ import {
   UploadApiOptions,
   UploadApiResponse,
 } from "cloudinary";
-import { createReadStream } from "streamifier";
 
 cloudinary.config({
   cloud_name: CLOUD_NAME,
@@ -28,30 +27,6 @@ export const uploadImage = async (imageBuffer: Buffer) => {
         return resolve(uploadResult);
       })
       .end(imageBuffer);
-  });
-};
-
-export const uploadImageBuffer = (buffer: Buffer) => {
-  const uploadConfig: UploadApiOptions = {
-    resource_type: "auto",
-    format: "jpg",
-    folder: "devlink",
-  };
-
-  return new Promise<UploadApiResponse>((resolve, reject) => {
-    // eslint-disable-next-line prefer-const
-    let cld_upload_stream = cloudinary.uploader.upload_stream(
-      uploadConfig,
-      (error, result) => {
-        if (result) {
-          resolve(result);
-        } else {
-          reject(error);
-        }
-      },
-    );
-
-    createReadStream(buffer).pipe(cld_upload_stream).on("error", reject);
   });
 };
 
