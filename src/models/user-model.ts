@@ -31,7 +31,10 @@ const userSchema = new mongoose.Schema(
     profile_email: String,
     profile_name: String,
     profile_last_name: String,
-    profile_image: imageSchema,
+    profile_image: {
+      type: imageSchema,
+      _id: false,
+    },
     profile_links: [{ platform: String, url: String }],
     profile_template: String,
   },

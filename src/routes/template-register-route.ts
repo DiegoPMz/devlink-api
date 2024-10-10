@@ -4,14 +4,12 @@ import verifyToken from "@/middlewares/verifyToken-middleware";
 import { Router } from "express";
 
 const route = Router();
-
 route.put(
   "/template",
   verifyToken,
   storeFile.single("user_file"),
   updateTemplate,
 );
-
 route.get("/template/:id", getTemplate);
 
 export default route;

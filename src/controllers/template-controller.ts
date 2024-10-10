@@ -10,27 +10,36 @@ type GetTemplateRequest = Request<{ id: string }>;
 export const updateTemplate = async (req: Request, res: Response) => {
   try {
     if (!req.body.data)
-      return res.status(400).send("The field Data is missing");
+      return res
+        .status(400)
+        .json(errorResponse("Missing required 'data' in request body", "400"));
 
     const parseBody = JSON.parse(req.body.data);
     const reqSchema = templateSchema.safeParse(parseBody);
     if (reqSchema.error || !reqSchema.success) {
-      return res.status(400).json(reqSchema.error.formErrors);
+      return res.status(400).json(reqSchema.error.format());
     }
 
-    const token = req.user ?? { email: "test@gmail.com" };
+    const token = req.user;
     if (!token)
       return res
         .status(404)
         .json(errorResponse("Server error: Unable to complete the request"));
-    const userDb = await userModel.findOne({ email: token.email });
+    const userDb = await userModel.findOne({ _id: token.id });
     if (!userDb) return res.status(400).send("Invalid credentials");
 
     const userData = reqSchema.data;
     const reqFile = req.file;
 
     if (!reqFile && !userData.profile_image)
-      return res.status(400).send("One Field image is required");
+      return res
+        .status(400)
+        .json(
+          errorResponse(
+            "At least one field 'user_file' or 'profile_image' is required",
+            "400",
+          ),
+        );
 
     let objectToSave = { ...userData };
 
@@ -49,15 +58,17 @@ export const updateTemplate = async (req: Request, res: Response) => {
         },
       };
     } else {
-      if (
-        !userDb.profile_image?.id ||
-        userDb.profile_image?.id !== userData.profile_image?.id
-      )
-        return res.status(400).send("request image field is not valid");
+      const areEqualImageID =
+        userDb.profile_image?.id === userData.profile_image?.id;
+
+      if (!userData.profile_image?.id || !areEqualImageID)
+        return res
+          .status(400)
+          .json(errorResponse("The provided image ID is not valid", "400"));
     }
 
     const userUpdated = await userModel.findOneAndUpdate(
-      { email: token.email },
+      { _id: token.id },
       { ...objectToSave, profile_template: userDb.id },
       { new: true },
     );

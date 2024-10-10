@@ -7,7 +7,7 @@ const validatorSchema =
     const validation = schema.safeParse(req.body);
 
     if (!validation.success || validation.error) {
-      return res.status(400).json(validation.error.formErrors);
+      return res.status(400).json(validation.error.format());
     }
 
     return next();
