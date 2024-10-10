@@ -4,6 +4,7 @@ import { LoginAuthType, RegisterAuthType } from "@/schemas/auth-schema";
 import {
   createAccessToken,
   createRefreshToken,
+  deleteEntityTokenExpired,
   JwtPayloadType,
   verifyJWT,
 } from "@/services/jwtTokens-service";
@@ -147,13 +148,23 @@ export const refreshToken = async (req: Request, res: Response) => {
     const refToken: unknown = req.cookies.refToken;
 
     if (!refToken || typeof refToken !== "string")
-      return res.status(400).send("bad request");
+      return res
+        .status(403)
+        .json(
+          errorResponse(
+            "You do not have permission to perform this action",
+            "403",
+          ),
+        );
 
     const { decoded, error } = await verifyJWT(refToken);
-
     if (error || !decoded) {
       res.clearCookie("refToken");
-      return res.status(401).send(errorResponse(error as string, "401"));
+      await deleteEntityTokenExpired(refToken, "ref");
+
+      return res
+        .status(401)
+        .send(errorResponse(error?.message as string, "401"));
     }
 
     await tokenModel.findOneAndDelete({

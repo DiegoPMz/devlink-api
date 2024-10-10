@@ -1,5 +1,3 @@
-import { Router } from "express";
-
 import {
   login,
   logout,
@@ -9,6 +7,7 @@ import {
 import validatorSchema from "@/middlewares/validator-middleware";
 import verifyToken from "@/middlewares/verifyToken-middleware";
 import { loginSchema, registerSchema } from "@/schemas/auth-schema";
+import { Router } from "express";
 
 const route = Router();
 route.post("/auth/register", validatorSchema(registerSchema), register);

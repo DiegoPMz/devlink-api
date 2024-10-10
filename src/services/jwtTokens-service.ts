@@ -1,4 +1,5 @@
 import { APP_ISSUER, PRIVATE_KEY } from "@/config/jwt-config";
+import tokenModel, { TokenSchemaType } from "@/models/token-model";
 import jwt from "jsonwebtoken";
 
 export interface JwtPayloadType {
@@ -8,7 +9,7 @@ export interface JwtPayloadType {
 
 interface verifyJWTResponse {
   decoded: undefined | JwtPayloadType;
-  error: false | string;
+  error: undefined | jwt.VerifyErrors;
 }
 
 const createJWT = (payload: JwtPayloadType, expiresIn: string) => {
@@ -46,14 +47,34 @@ export const verifyJWT = (token: string) => {
       if (err) {
         return resolve({
           decoded: undefined,
-          error: err.message,
+          error: err,
         });
       }
 
       return resolve({
         decoded: tokenDecoded as JwtPayloadType,
-        error: false,
+        error: undefined,
       });
     });
   });
+};
+
+export const deleteEntityTokenExpired = async (
+  token: string,
+  type: TokenSchemaType["type"],
+) => {
+  try {
+    const { error } = await verifyJWT(token);
+    if (!(error instanceof jwt.TokenExpiredError)) return;
+
+    const decodedToken = jwt.decode(token) as JwtPayloadType;
+    return await tokenModel.findOneAndDelete({
+      user_id: decodedToken?.id,
+      token: token,
+      type: type,
+    });
+  } catch (error) {
+    console.log(error);
+    return;
+  }
 };
