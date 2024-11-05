@@ -1,6 +1,6 @@
 import {
-  getSecureTemplate,
   getTemplate,
+  templateDetails,
   updateTemplate,
 } from "@/controllers/template-controller";
 import storeFile from "@/middlewares/multer-middleware";
@@ -15,6 +15,6 @@ route.put(
   updateTemplate,
 );
 route.get("/template/:id", getTemplate);
-route.get("/secure-template", verifyToken, getSecureTemplate);
+route.get("/template-details", verifyToken, templateDetails);
 
 export default route;

@@ -119,7 +119,7 @@ export const getTemplate = async (req: GetTemplateRequest, res: Response) => {
   }
 };
 
-export const getSecureTemplate = async (req: Request, res: Response) => {
+export const templateDetails = async (req: Request, res: Response) => {
   try {
     const id = req.user?.id;
     if (!id)
