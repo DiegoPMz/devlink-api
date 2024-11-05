@@ -77,7 +77,11 @@ export const updateTemplate = async (req: Request, res: Response) => {
         .status(404)
         .json(errorResponse("Server error: Unable to complete the request"));
 
-    return res.json(defaultUserResponseDto(userUpdated));
+    return res.json({
+      ...defaultUserResponseDto(userUpdated),
+      id: userUpdated.id,
+      updatedAt: userUpdated.updatedAt,
+    });
   } catch (err) {
     console.log(err);
     return res
@@ -112,5 +116,31 @@ export const getTemplate = async (req: GetTemplateRequest, res: Response) => {
     return res
       .status(400)
       .json(errorResponse("User not found with the provided ID", "400"));
+  }
+};
+
+export const getSecureTemplate = async (req: Request, res: Response) => {
+  try {
+    const id = req.user?.id;
+    if (!id)
+      return res
+        .status(401)
+        .json(errorResponse("Authentication failed", "401"));
+
+    const currentTemplate = await userModel.findById(id);
+
+    if (!currentTemplate)
+      return res
+        .status(404)
+        .json(errorResponse("No template found for the authenticated user"));
+
+    return res.json({
+      ...defaultUserResponseDto(currentTemplate),
+      id: currentTemplate.id,
+      createdAt: currentTemplate.createdAt,
+    });
+  } catch (err) {
+    console.log(err);
+    return res.status(404).json(errorResponse("An unexpected error occurred"));
   }
 };
