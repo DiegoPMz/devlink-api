@@ -12,6 +12,20 @@ const imageSchema = new mongoose.Schema({
   url: String,
 });
 
+const linkSchema = new mongoose.Schema(
+  {
+    platform: {
+      type: String,
+      required: true,
+    },
+    url: {
+      type: String,
+      required: true,
+    },
+  },
+  { id: true },
+);
+
 const userSchema = new mongoose.Schema(
   {
     email: {
@@ -35,7 +49,7 @@ const userSchema = new mongoose.Schema(
       type: imageSchema,
       _id: false,
     },
-    profile_links: [{ platform: String, url: String }],
+    profile_links: [linkSchema],
     profile_template: String,
   },
   {
