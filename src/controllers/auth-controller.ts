@@ -70,7 +70,10 @@ export const register: RegisterController = async (req, res) => {
     res.cookie("accToken", accessToken, { httpOnly: true, secure: true });
     res.cookie("refToken", refreshToken, { httpOnly: true, secure: true });
 
-    return res.json(registerResponseDto(newUser));
+    return res.json({
+      ...registerResponseDto(newUser),
+      id: newUser.id,
+    });
   } catch (err) {
     console.error(err);
     return res
@@ -117,8 +120,11 @@ export const login: LoginController = async (req, res) => {
 
     res.cookie("accToken", accessToken, { httpOnly: true, secure: true });
     res.cookie("refToken", refreshToken, { httpOnly: true, secure: true });
-
-    return res.json(defaultUserResponseDto(userDb));
+    return res.json({
+      ...defaultUserResponseDto(userDb),
+      id: userDb.id,
+      createdAt: userDb.createdAt,
+    });
   } catch (err) {
     console.log(err);
     return res.status(404).send("Server error: Unable to complete the request");
