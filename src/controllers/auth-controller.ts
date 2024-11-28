@@ -9,7 +9,7 @@ import {
   verifyJWT,
 } from "@/services/jwtTokens-service";
 import { comparePasswords } from "@/utils/crypt-password-utils";
-import { errorResponse } from "@/utils/errorResponse-dto";
+import createErrorResponseApp from "@/utils/error-response-app";
 import {
   defaultUserResponseDto,
   registerResponseDto,
@@ -26,9 +26,17 @@ export const register: RegisterController = async (req, res) => {
 
     const alreadyExistUserDb = await UserModel.findOne({ email: email });
     if (alreadyExistUserDb)
-      return res.status(400).json(errorResponse("Email already in use", "400"));
+      return res.status(409).json(
+        createErrorResponseApp(409, {
+          email: "The email address is already in use",
+        }),
+      );
     if (password !== confirm_password)
-      return res.status(400).json(errorResponse("invalid password", "400"));
+      return res.status(400).json(
+        createErrorResponseApp(400, {
+          password: "Passwords do not match",
+        }),
+      );
 
     const passwordHash = await bcrypt.hash(password, 10);
     const newUser = await UserModel.create({
@@ -76,9 +84,11 @@ export const register: RegisterController = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    return res
-      .status(404)
-      .json(errorResponse("Server error: Unable to complete the request"));
+    return res.status(500).json(
+      createErrorResponseApp(500, {
+        service: "An unexpected error occurred. Please try again later",
+      }),
+    );
   }
 };
 
@@ -88,14 +98,24 @@ export const login: LoginController = async (req, res) => {
     const userDb = await UserModel.findOne({ email: email });
 
     if (!userDb)
-      return res.status(400).json(errorResponse("Invalid credentials", "400"));
+      return res.status(400).json(
+        createErrorResponseApp(400, {
+          email: "The credentials provided are incorrect",
+          password: "The credentials provided are incorrect",
+        }),
+      );
 
     const arePasswordEquals = await comparePasswords(
       password,
       userDb.password as string,
     );
     if (!arePasswordEquals)
-      return res.status(400).json(errorResponse("Incorrect password", "400"));
+      return res.status(400).json(
+        createErrorResponseApp(400, {
+          email: "The credentials provided are incorrect",
+          password: "The credentials provided are incorrect",
+        }),
+      );
 
     const accessToken = await createAccessToken({
       id: userDb.id,
@@ -126,26 +146,40 @@ export const login: LoginController = async (req, res) => {
       createdAt: userDb.createdAt,
     });
   } catch (err) {
-    console.log(err);
-    return res.status(404).send("Server error: Unable to complete the request");
+    console.error(err);
+    return res.status(500).json(
+      createErrorResponseApp(500, {
+        service: "An unexpected error occurred. Please try again later",
+      }),
+    );
   }
 };
 
 export const logout = async (req: Request, res: Response) => {
   try {
     const user = req.user as JwtPayloadType;
+    res.clearCookie("refToken");
+    res.clearCookie("accToken");
+
     const deletedTokens = await tokenModel.deleteMany({ user_id: user.id });
     if (!deletedTokens)
-      return res
-        .status(404)
-        .json(errorResponse("Server error: Unable to complete the request"));
+      return res.status(500).json(
+        createErrorResponseApp(500, {
+          service: "Unable to process your request at the moment",
+        }),
+      );
 
-    return res.send("You have been logged out successfully");
+    return res.status(200).json({
+      status: 200,
+      message: "You have been logged out successfully",
+    });
   } catch (error) {
-    console.log(error);
-    return res
-      .status(404)
-      .json(errorResponse("Server error: Unable to complete the request"));
+    console.error(error);
+    return res.status(500).json(
+      createErrorResponseApp(500, {
+        service: "Unable to process your request at the moment",
+      }),
+    );
   }
 };
 
@@ -154,23 +188,22 @@ export const refreshToken = async (req: Request, res: Response) => {
     const refToken: unknown = req.cookies.refToken;
 
     if (!refToken || typeof refToken !== "string")
-      return res
-        .status(403)
-        .json(
-          errorResponse(
-            "You do not have permission to perform this action",
-            "403",
-          ),
-        );
+      return res.status(403).json(
+        createErrorResponseApp(403, {
+          authentication: "You do not have permission to perform this action",
+        }),
+      );
 
     const { decoded, error } = await verifyJWT(refToken);
     if (error || !decoded) {
       res.clearCookie("refToken");
       await deleteEntityTokenExpired(refToken, "ref");
 
-      return res
-        .status(401)
-        .send(errorResponse(error?.message as string, "401"));
+      return res.status(401).send(
+        createErrorResponseApp(401, {
+          authentication: "Authentication failed. Please log in again",
+        }),
+      );
     }
 
     await tokenModel.findOneAndDelete({
@@ -201,11 +234,16 @@ export const refreshToken = async (req: Request, res: Response) => {
     res.cookie("accToken", newAccessToken, { secure: true, httpOnly: true });
     res.cookie("refToken", newRefreshToken, { secure: true, httpOnly: true });
 
-    return res.send("Tokens generated successfully");
+    return res.status(201).json({
+      status: 201,
+      message: "Operation completed successfully",
+    });
   } catch (error) {
-    console.log(error);
-    return res
-      .status(404)
-      .json(errorResponse("Server error: Unable to complete the request"));
+    console.error(error);
+    return res.status(500).json(
+      createErrorResponseApp(500, {
+        service: "Authentication required. Please log in again",
+      }),
+    );
   }
 };
