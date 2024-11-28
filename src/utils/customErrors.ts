@@ -8,7 +8,10 @@ export class AppError extends Error {
 }
 
 export class ClientError extends AppError {
-  constructor(message: string, status: number = 400) {
+  public field: string;
+
+  constructor(message: string, field: string, status: number = 400) {
     super(message, status);
+    this.field = field;
   }
 }
