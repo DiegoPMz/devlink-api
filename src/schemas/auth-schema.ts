@@ -3,35 +3,43 @@ import z from "zod";
 export const loginSchema = z
   .object({
     email: z
-      .string({ message: "Email must be a string" })
-      .email({ message: "Invalid email" }),
+      .string({ message: "Please enter a valid email address" })
+      .email({ message: "This email address seems to be invalid" }),
 
     password: z
-      .string({ message: "Password must be a string" })
+      .string({ message: "Please enter your password" })
       .trim()
-      .min(1, { message: "Password can't be empty" }),
+      .min(8, { message: "Password is incorrect" }),
   })
-  .strict({ message: "Incorrect request, please check the data provided" });
+  .strict({
+    message:
+      "There seems to be an issue with the information provided. Please double-check",
+  });
 
 export const registerSchema = z
   .object({
     email: z
-      .string({ message: "Email must be a string" })
-      .email({ message: "Invalid email" }),
+      .string({ message: "Please enter a valid email address" })
+      .email({ message: "This email address seems to be invalid" }),
 
     password: z
-      .string({ message: "Password must be a string" })
+      .string({ message: "Please enter your password" })
       .trim()
-      .min(1, { message: "Password can't be empty" }),
+      .min(8, { message: "Password must be at least 8 characters long" }),
 
     confirm_password: z
-      .string({ message: "Confirm password must be a string" })
+      .string({ message: "Please confirm your password" })
       .trim()
-      .min(1, { message: "Password can't be empty" }),
+      .min(8, {
+        message: "Password confirmation must be at least 8 characters long",
+      }),
   })
-  .strict({ message: "Incorrect request, please check the data provided" })
+  .strict({
+    message:
+      "There seems to be an issue with the information provided. Please double-check",
+  })
   .refine((data) => data.password === data.confirm_password, {
-    message: "Passwords don't match",
+    message: "Passwords do not match. Please try again",
     path: ["confirm_password"],
   });
 

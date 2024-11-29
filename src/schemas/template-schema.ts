@@ -18,46 +18,46 @@ const platformsEnumSchema = z
       "twitch",
       "youtube",
     ],
-    { message: "Invalid platform. Select a valid option" },
+    { message: "Select a valid platform" },
   )
   .readonly();
 
 const profileLinksSchema = z.object({
   platform: platformsEnumSchema,
   url: z
-    .string({ message: "Url must be a string" })
-    .url("Invalid URL format")
+    .string({ message: "Please provide a URL" })
+    .url("This URL format is not valid")
     .trim()
-    .min(1, { message: "url can't be empty " }),
+    .min(1, { message: "The URL cannot be empty" }),
 });
 
 export const templateSchema = z
   .object({
     profile_email: z
-      .string({ message: "Email must be a string" })
-      .email({ message: "Invalid email" }),
+      .string({ message: "Please provide an email address" })
+      .email({ message: "This email address is not valid" }),
     profile_name: z
-      .string({ message: "Name must be a string" })
-      .min(1, { message: "Name can't be empty " }),
+      .string({ message: "Please provide a name" })
+      .min(1, { message: "The name cannot be empty" }),
     profile_last_name: z
-      .string({ message: "Last name must be a string" })
-      .min(1, { message: "Last name can't be empty " }),
+      .string({ message: "Please provide a last name" })
+      .min(1, { message: "The last name cannot be empty" }),
     profile_image: z
       .object({
-        id: z.string().min(1, { message: "Image id can't be empty " }),
-        url: z.string().min(1, { message: "Image url can't be empty " }),
+        id: z.string().min(1, { message: "The image ID cannot be empty" }),
+        url: z.string().min(1, { message: "The image URL cannot be empty" }),
       })
       .optional(),
     profile_links: z
       .array(profileLinksSchema, {
-        message: "Profile links must be a valid array",
+        message: "Profile links should be a valid list",
       })
-      .nonempty({ message: "The user links can't be empty" }),
+      .nonempty({ message: "The list of user links cannot be empty" }),
   })
-  .strict({ message: "Incorrect request, please check the data provided" });
-
-export type TemplateType = z.infer<typeof templateSchema>;
+  .strict({ message: "The provided data is not correct. Please check again" });
 
 export const getTemplateSchema = z
-  .string({ message: "The value provided must be a valid string" })
-  .min(1, { message: "The Template ID cannot be an empty string" });
+  .string({ message: "Please provide a template ID" })
+  .min(1, { message: "The template ID cannot be empty" });
+
+export type TemplateType = z.infer<typeof templateSchema>;
