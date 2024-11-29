@@ -50,7 +50,15 @@ const userSchema = new mongoose.Schema(
       _id: false,
     },
     profile_links: [linkSchema],
-    profile_template: String,
+    profile_template: {
+      type: String,
+      unique: true,
+      required: true,
+      match: [
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+        "Invalid UUID format. A valid UUID must follow the pattern 8-4-4-4-12 hexadecimal characters (e.g., 550e8400-e29b-41d4-a716-446655440000).",
+      ], //UUID v4
+    },
   },
   {
     timestamps: true,
