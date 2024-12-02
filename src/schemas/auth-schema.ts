@@ -9,7 +9,7 @@ export const loginSchema = z
     password: z
       .string({ message: "Please enter your password" })
       .trim()
-      .min(8, { message: "Password is incorrect" }),
+      .min(1, { message: "Password cannot be empty" }),
   })
   .strict({
     message:
