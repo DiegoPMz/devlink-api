@@ -10,6 +10,14 @@ const errorHandler = (
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _: unknown,
 ) => {
+  if (err instanceof SyntaxError) {
+    return res.status(400).json(
+      createErrorResponseApp(400, {
+        body: "Invalid JSON format",
+      }),
+    );
+  }
+
   if (err instanceof ClientError) {
     return res.status(err.status).json(
       createErrorResponseApp(err.status, {

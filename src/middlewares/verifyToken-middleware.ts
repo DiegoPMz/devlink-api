@@ -1,21 +1,19 @@
 import { APP_ISSUER, PRIVATE_KEY } from "@/config/jwt-config";
 import tokenModel from "@/models/token-model";
 import { JwtPayloadType } from "@/services/jwtTokens-service";
-import { errorResponse } from "@/utils/errorResponse-dto";
+import createErrorResponseApp from "@/utils/error-response-app";
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-
-// JsonWebTokenError
-// NotBeforeError
-// TokenExpiredError
 
 const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
   const token: unknown = req.cookies.accToken;
 
   if (!token || typeof token !== "string")
-    return res
-      .status(403)
-      .json(errorResponse("No token, authorization denied", "403"));
+    return res.status(403).json(
+      createErrorResponseApp(403, {
+        authentication: "No token, authorization denied",
+      }),
+    );
 
   const OPTIONS: jwt.VerifyOptions = {
     algorithms: ["HS256"],
@@ -27,11 +25,10 @@ const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
     if (!decodedToken || typeof decodedToken === "string") return;
 
     const id = decodedToken?.id as string;
-    try {
-      await tokenModel.findOneAndDelete({ user_id: id, token: token });
-    } catch (error) {
-      console.log(error);
-    }
+
+    await tokenModel
+      .findOneAndDelete({ user_id: id, token: token })
+      .catch((res) => res);
   };
 
   jwt.verify(token, PRIVATE_KEY, OPTIONS, (err, tokenDecoded) => {
@@ -39,7 +36,11 @@ const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
       if (err instanceof jwt.TokenExpiredError) invalidateToken();
       res.clearCookie("accToken");
       req.user = undefined;
-      return res.status(401).json(errorResponse(err.message, "401"));
+      return res.status(401).json(
+        createErrorResponseApp(401, {
+          authentication: err.message,
+        }),
+      );
     }
 
     req.user = tokenDecoded as JwtPayloadType;
