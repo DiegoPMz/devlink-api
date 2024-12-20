@@ -52,18 +52,19 @@ const userSchema = new mongoose.Schema(
     profile_links: [linkSchema],
     profile_template: {
       type: String,
-      unique: true,
-      required: true,
-      match: [
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
-        "Invalid UUID format. A valid UUID must follow the pattern 8-4-4-4-12 hexadecimal characters (e.g., 550e8400-e29b-41d4-a716-446655440000).",
-      ], //UUID v4
+    },
+    theme: {
+      type: String,
+    },
+    template_bg: {
+      type: String,
     },
   },
   {
     timestamps: true,
+    id: true,
   },
 );
 
 export default mongoose.model("User", userSchema);
-export type UserSchemaType = InferSchemaType<typeof userSchema>;
+export type UserSchemaType = InferSchemaType<typeof userSchema> | null;

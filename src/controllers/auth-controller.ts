@@ -1,3 +1,4 @@
+import { APP_THEME_OPTIONS, TEMPLATE_BG_OPTIONS } from "@/data/template-data";
 import tokenModel from "@/models/token-model";
 import UserModel from "@/models/user-model";
 import { LoginAuthType, RegisterAuthType } from "@/schemas/auth-schema";
@@ -51,7 +52,8 @@ export const register: RegisterController = async (req, res) => {
         url: "",
       },
       profile_links: [],
-      profile_template: "",
+      theme: APP_THEME_OPTIONS[0],
+      template_bg: TEMPLATE_BG_OPTIONS[0],
     });
 
     const accessToken = await createAccessToken({
