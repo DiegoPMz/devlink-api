@@ -1,12 +1,28 @@
 import z from "zod";
 
-const handleErrorSchema = (errors: z.ZodIssue[]) => {
-  const formattedErrors = errors.reduce((acc, item) => {
-    return (acc = {
+const handleErrorSchema = <E>(errors: z.ZodError<E>) => {
+  const schemaErrors = errors.format();
+  const keys = Object.keys(schemaErrors).slice(1);
+  if (!keys) return {};
+
+  const formattedErrors = keys.reduce((acc, key) => {
+    const getError = schemaErrors[key as keyof typeof schemaErrors];
+    if (getError === undefined) return acc;
+
+    if (key === "profile_links") {
+      return {
+        ...acc,
+        [key]: getError ?? [],
+      };
+    }
+
+    return {
       ...acc,
-      [item.path[0] ?? "body"]: item.path[0] ? item.message : item.code,
-    });
-  }, {}) as Record<z.ZodIssue["path"][0], z.ZodIssue["message"]>;
+      [key]:
+        (getError as { _errors: Array<unknown> })._errors?.[0] ??
+        "This field has an error",
+    };
+  }, {});
 
   return formattedErrors;
 };

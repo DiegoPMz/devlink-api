@@ -10,14 +10,14 @@ const platformsEnumSchema = z
   .readonly();
 
 const profileAppTheme = z.enum(APP_THEME_OPTIONS, {
-  message: `Invalid value for profileAppTheme. Expected one of: ${APP_THEME_OPTIONS.join(", ")}`,
+  message: `Invalid value. Expected one of: ${APP_THEME_OPTIONS.join(", ")}`,
 });
 
 const profileTemplateBg = z.enum(TEMPLATE_BG_OPTIONS, {
-  message: `Invalid value for profileTemplateBg. Expected one of: ${TEMPLATE_BG_OPTIONS.join(", ")}`,
+  message: `Invalid value. Expected one of: ${TEMPLATE_BG_OPTIONS.join(", ")}`,
 });
 
-const profileLinksSchema = z.object({
+export const profileLinksSchema = z.object({
   platform: platformsEnumSchema,
   url: z
     .string({ message: "Please provide a URL" })

@@ -21,7 +21,7 @@ export const updateTemplate = async (req: Request, res: Response) => {
     const parseBody = JSON.parse(req.body.data);
     const reqSchema = templateSchema.safeParse(parseBody);
     if (reqSchema.error || !reqSchema.success) {
-      const formattedError = handleErrorSchema(reqSchema.error.errors);
+      const formattedError = handleErrorSchema(reqSchema.error);
       return res.status(400).json(createErrorResponseApp(400, formattedError));
     }
 

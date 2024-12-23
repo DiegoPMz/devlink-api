@@ -9,7 +9,7 @@ const validatorSchema =
     const validation = schema.safeParse(req.body);
 
     if (!validation.success || validation.error) {
-      const formattedErrors = handleErrorSchema(validation.error.errors);
+      const formattedErrors = handleErrorSchema(validation.error);
       return res.status(400).json(createErrorResponseApp(400, formattedErrors));
     }
 
