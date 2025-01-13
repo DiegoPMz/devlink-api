@@ -56,25 +56,31 @@ export const register: RegisterController = async (req, res) => {
       template_bg: TEMPLATE_BG_OPTIONS[0],
     });
 
+    const sessionId = crypto.randomUUID();
+
     const accessToken = await createAccessToken({
       id: newUser.id,
       roles: newUser.credentials?.roles as string,
+      session_id: sessionId,
     });
     const refreshToken = await createRefreshToken({
       id: newUser.id,
       roles: newUser.credentials?.roles as string,
+      session_id: sessionId,
     });
 
     await tokenModel.create({
       token: accessToken,
       type: "acc",
       user_id: newUser.id,
+      session_id: sessionId,
     });
 
     await tokenModel.create({
       token: refreshToken,
       type: "ref",
       user_id: newUser.id,
+      session_id: sessionId,
     });
 
     res.cookie("accToken", accessToken, { httpOnly: true, secure: true });
@@ -119,25 +125,31 @@ export const login: LoginController = async (req, res) => {
         }),
       );
 
+    const sessionId = crypto.randomUUID();
+
     const accessToken = await createAccessToken({
       id: userDb.id,
       roles: userDb.credentials?.roles as string,
+      session_id: sessionId,
     });
     const refreshToken = await createRefreshToken({
       id: userDb.id,
       roles: userDb.credentials?.roles as string,
+      session_id: sessionId,
     });
 
     await tokenModel.create({
       token: accessToken,
       type: "acc",
       user_id: userDb.id,
+      session_id: sessionId,
     });
 
     await tokenModel.create({
       token: refreshToken,
       type: "ref",
       user_id: userDb.id,
+      session_id: sessionId,
     });
 
     res.cookie("accToken", accessToken, { httpOnly: true, secure: true });
@@ -163,7 +175,10 @@ export const logout = async (req: Request, res: Response) => {
     res.clearCookie("refToken");
     res.clearCookie("accToken");
 
-    const deletedTokens = await tokenModel.deleteMany({ user_id: user.id });
+    const deletedTokens = await tokenModel.deleteMany({
+      user_id: user.id,
+      session_id: user.session_id,
+    });
     if (!deletedTokens)
       return res.status(500).json(
         createErrorResponseApp(500, {
@@ -208,15 +223,17 @@ export const refreshToken = async (req: Request, res: Response) => {
       );
     }
 
-    await tokenModel.findOneAndDelete({
+    await tokenModel.deleteMany({
       user_id: decoded.id,
-      token: refToken,
-      type: "ref",
+      session_id: decoded.session_id,
     });
+
+    const sessionId = crypto.randomUUID();
 
     const payload = {
       id: decoded.id,
       roles: decoded.roles,
+      session_id: sessionId,
     };
 
     const newAccessToken = await createAccessToken(payload);
@@ -226,11 +243,13 @@ export const refreshToken = async (req: Request, res: Response) => {
       token: newAccessToken,
       type: "acc",
       user_id: decoded.id,
+      session_id: sessionId,
     });
     await tokenModel.create({
       token: newRefreshToken,
       type: "ref",
       user_id: decoded.id,
+      session_id: sessionId,
     });
 
     res.cookie("accToken", newAccessToken, { secure: true, httpOnly: true });

@@ -24,10 +24,12 @@ const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
     const decodedToken = jwt.decode(token);
     if (!decodedToken || typeof decodedToken === "string") return;
 
-    const id = decodedToken?.id as string;
-
     await tokenModel
-      .findOneAndDelete({ user_id: id, token: token })
+      .findOneAndDelete({
+        token: token,
+        user_id: decodedToken?.id,
+        session_id: decodedToken?.session_id,
+      })
       .catch((res) => res);
   };
 

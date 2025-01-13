@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 export interface JwtPayloadType {
   id: string;
   roles: string;
+  session_id: string;
 }
 
 interface verifyJWTResponse {
@@ -69,9 +70,10 @@ export const deleteEntityTokenExpired = async (
 
     const decodedToken = jwt.decode(token) as JwtPayloadType;
     return await tokenModel.findOneAndDelete({
-      user_id: decodedToken?.id,
+      user_id: decodedToken.id,
       token: token,
       type: type,
+      session_id: decodedToken.session_id,
     });
   } catch (error) {
     console.log(error);

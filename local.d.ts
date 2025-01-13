@@ -1,6 +1,4 @@
 import { JwtPayloadType } from "@/services/jwtTokens-service";
-import express from "express";
-console.log(express && "");
 
 declare global {
   namespace Express {

@@ -8,10 +8,12 @@ export const APP_SOCIAL_MEDIA_PLATFORMS = [
   "gitlab",
   "github",
   "hashnode",
+  "instagram",
   "linkedin",
   "stackoverflow",
-  "twitter",
   "twitch",
+  "tiktok",
+  "x",
   "youtube",
 ] as const;
 

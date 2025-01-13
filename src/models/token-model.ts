@@ -4,6 +4,7 @@ export interface TokenSchemaType {
   token: string;
   type: "acc" | "ref";
   user_id: string;
+  session_id: string;
 }
 
 const tokenSchemaDb = new mongoose.Schema<TokenSchemaType>({
@@ -15,6 +16,9 @@ const tokenSchemaDb = new mongoose.Schema<TokenSchemaType>({
     type: String,
   },
   type: {
+    type: String,
+  },
+  session_id: {
     type: String,
   },
 });
