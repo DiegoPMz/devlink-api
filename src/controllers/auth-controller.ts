@@ -57,22 +57,14 @@ export const register: RegisterController = async (req, res) => {
     });
 
     const sessionId = crypto.randomUUID();
-
     const accessToken = await createAccessToken({
       id: newUser.id,
-      roles: newUser.credentials?.roles as string,
+      roles: newUser.credentials?.roles ?? "ROLE_USER",
       session_id: sessionId,
     });
     const refreshToken = await createRefreshToken({
       id: newUser.id,
-      roles: newUser.credentials?.roles as string,
-      session_id: sessionId,
-    });
-
-    await tokenModel.create({
-      token: accessToken,
-      type: "acc",
-      user_id: newUser.id,
+      roles: newUser.credentials?.roles ?? "ROLE_USER",
       session_id: sessionId,
     });
 
@@ -126,22 +118,14 @@ export const login: LoginController = async (req, res) => {
       );
 
     const sessionId = crypto.randomUUID();
-
     const accessToken = await createAccessToken({
       id: userDb.id,
-      roles: userDb.credentials?.roles as string,
+      roles: userDb.credentials?.roles ?? "ROLE_USER",
       session_id: sessionId,
     });
     const refreshToken = await createRefreshToken({
       id: userDb.id,
-      roles: userDb.credentials?.roles as string,
-      session_id: sessionId,
-    });
-
-    await tokenModel.create({
-      token: accessToken,
-      type: "acc",
-      user_id: userDb.id,
+      roles: userDb.credentials?.roles ?? "ROLE_USER",
       session_id: sessionId,
     });
 
@@ -154,6 +138,7 @@ export const login: LoginController = async (req, res) => {
 
     res.cookie("accToken", accessToken, { httpOnly: true, secure: true });
     res.cookie("refToken", refreshToken, { httpOnly: true, secure: true });
+
     return res.json({
       ...defaultUserResponseDto(userDb),
       id: userDb.id,
@@ -175,10 +160,13 @@ export const logout = async (req: Request, res: Response) => {
     res.clearCookie("refToken");
     res.clearCookie("accToken");
 
-    const deletedTokens = await tokenModel.deleteMany({
-      user_id: user.id,
-      session_id: user.session_id,
-    });
+    const deletedTokens = await tokenModel
+      .deleteMany({
+        user_id: user.id,
+        session_id: user.session_id,
+      })
+      .catch(() => null);
+
     if (!deletedTokens)
       return res.status(500).json(
         createErrorResponseApp(500, {
@@ -192,6 +180,8 @@ export const logout = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error(error);
+    res.clearCookie("refToken");
+    res.clearCookie("accToken");
     return res.status(500).json(
       createErrorResponseApp(500, {
         service: "Unable to process your request at the moment",
@@ -223,33 +213,40 @@ export const refreshToken = async (req: Request, res: Response) => {
       );
     }
 
-    await tokenModel.deleteMany({
-      user_id: decoded.id,
-      session_id: decoded.session_id,
-    });
+    const getStoredToken = await tokenModel
+      .findOneAndDelete({
+        token: refToken,
+        session_id: decoded.session_id,
+        user_id: decoded.id,
+      })
+      .catch(() => null);
 
-    const sessionId = crypto.randomUUID();
+    if (!getStoredToken) {
+      res.clearCookie("refToken");
+      res.clearCookie("accToken");
 
+      return res.status(401).json(
+        createErrorResponseApp(401, {
+          authentication: "Token validation failed. Please log in again",
+        }),
+      );
+    }
+
+    const newSessionId = crypto.randomUUID();
     const payload = {
       id: decoded.id,
       roles: decoded.roles,
-      session_id: sessionId,
+      session_id: newSessionId,
     };
 
     const newAccessToken = await createAccessToken(payload);
     const newRefreshToken = await createRefreshToken(payload);
 
     await tokenModel.create({
-      token: newAccessToken,
-      type: "acc",
-      user_id: decoded.id,
-      session_id: sessionId,
-    });
-    await tokenModel.create({
       token: newRefreshToken,
       type: "ref",
       user_id: decoded.id,
-      session_id: sessionId,
+      session_id: newSessionId,
     });
 
     res.cookie("accToken", newAccessToken, { secure: true, httpOnly: true });
@@ -261,6 +258,8 @@ export const refreshToken = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error(error);
+    res.clearCookie("refToken");
+    res.clearCookie("accToken");
     return res.status(500).json(
       createErrorResponseApp(500, {
         service: "Authentication required. Please log in again",
