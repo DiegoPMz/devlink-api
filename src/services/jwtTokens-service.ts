@@ -30,11 +30,11 @@ const createJWT = (payload: JwtPayloadType, expiresIn: string) => {
 };
 
 export const createAccessToken = (payload: JwtPayloadType) => {
-  return createJWT(payload, "30s");
+  return createJWT(payload, "10m");
 };
 
 export const createRefreshToken = (payload: JwtPayloadType) => {
-  return createJWT(payload, "1m");
+  return createJWT(payload, "10d");
 };
 
 export const verifyJWT = (token: string) => {

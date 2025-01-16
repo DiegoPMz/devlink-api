@@ -6,7 +6,7 @@
   "scripts": {
     "start": "ts-node src/index.ts",
     "dev": "npx nodemon ",
-    "build": "tsc",
+    "build": "tsc --build",
     "test": "echo \"Error: no test specified\" && exit 1",
     "f-check": "npx prettier . --check",
     "f-write": "npx prettier . --write",
