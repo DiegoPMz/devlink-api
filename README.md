@@ -1,6 +1,6 @@
 # DevLinks-api :paperclip:
 
-An API to manage and share links easily. This project allows users to authenticate, create profiles, upload links, and manage their personal collections.
+An API to manage and share links easily. This project allows users to authenticate, create profiles and upload links.
 
 ## Table of Contents :clipboard:
 
@@ -20,7 +20,7 @@ An API to manage and share links easily. This project allows users to authentica
 
 ## Overview :book:
 
-This project implements a **link-sharing API** that allows users to authenticate, create profiles, and manage their links and collections. The focus is on providing a RESTful interface to manage and share links with secure authentication.
+This project implements a **link-sharing API** that allows users to authenticate, create profiles, and manage their links. The focus is on providing a RESTful interface to manage and share links with secure authentication.
 
 ### Screenshot :camera:
 
