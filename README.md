@@ -53,6 +53,8 @@ This project implements a **link-sharing API** that allows users to authenticate
 
 - **TypeScript**: For type-safe development and enhanced editor support.
 - **ts-node**: TypeScript execution engine for Node.js
+- **ts-patch**: A tool that enables the use of custom TypeScript transformers by patching the TypeScript compiler (tsc). It allows developers to enhance the build process with additional capabilities, such as path alias resolution or advanced code transformations.
+- **typescript-transform-paths**: A TypeScript transformer that automatically resolves and rewrites module path aliases configured in tsconfig.json. It simplifies the build process and avoids runtime errors related to unresolved module paths. Works seamlessly with ts-patch for easy integration.
 - **ESLint & Prettier**: Code linting and formatting.
 - **Zod**: Schema validation library for input and API responses.
 - **nodemon**: Development utility that automatically restarts the server when file changes are detected.

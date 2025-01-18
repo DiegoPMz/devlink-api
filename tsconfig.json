@@ -3,7 +3,7 @@
     /* base options */
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "target": "ES2022",
+    "target": "ESNext",
     // "verbatimModuleSyntax": true,
     "allowJs": true,
     "resolveJsonModule": true,
@@ -13,12 +13,14 @@
     /* transpiling with node */
     "moduleResolution": "NodeNext",
     "module": "NodeNext",
-    "outDir": "dist",
+    "outDir": "dist/src",
+    "rootDir": "src",
     "sourceMap": true,
     "removeComments": true,
 
     /* strictness */
     "strict": true,
+    "alwaysStrict": true,
     "noUnusedLocals": true,
     "noImplicitReturns": true,
     "forceConsistentCasingInFileNames": true,
@@ -27,6 +29,10 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
-    }
-  }
+    },
+
+    "plugins": [{ "transform": "typescript-transform-paths" }]
+  },
+  "include": ["src", "local.d.ts"],
+  "exclude": ["node_modules", "dist"]
 }
