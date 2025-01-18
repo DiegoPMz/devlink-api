@@ -75,8 +75,16 @@ export const register: RegisterController = async (req, res) => {
       session_id: sessionId,
     });
 
-    res.cookie("accToken", accessToken, { httpOnly: true, secure: true });
-    res.cookie("refToken", refreshToken, { httpOnly: true, secure: true });
+    res.cookie("accToken", accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    });
+    res.cookie("refToken", refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    });
 
     return res.json({
       ...registerResponseDto(newUser),
@@ -136,8 +144,16 @@ export const login: LoginController = async (req, res) => {
       session_id: sessionId,
     });
 
-    res.cookie("accToken", accessToken, { httpOnly: true, secure: true });
-    res.cookie("refToken", refreshToken, { httpOnly: true, secure: true });
+    res.cookie("accToken", accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    });
+    res.cookie("refToken", refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    });
 
     return res.json({
       ...defaultUserResponseDto(userDb),
@@ -249,8 +265,17 @@ export const refreshToken = async (req: Request, res: Response) => {
       session_id: newSessionId,
     });
 
-    res.cookie("accToken", newAccessToken, { secure: true, httpOnly: true });
-    res.cookie("refToken", newRefreshToken, { secure: true, httpOnly: true });
+    res.cookie("accToken", newAccessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    });
+
+    res.cookie("refToken", newRefreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    });
 
     return res.status(201).json({
       status: 201,
